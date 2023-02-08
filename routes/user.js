@@ -3,14 +3,20 @@ const express=require('express');
 const connection=require('../connection');
 const router=express.Router();
 
-router.post('./signup',(req,res)=>{
-    let user=req.body;
-    query="select email,password,role,status from user where email=?";
-    connection.query(query,[user.email],(err,results)=>{
+const jwt= require('jsonwebtoken');
+const nodemailer= require('nodemailer');
+require('dotenv').config();
+
+router.post('/signup',(req,res)=>{
+    const {name,contactno,email,password,status,role}=req.body;
+    //let user=req.body;
+    //let email=req.params.id;
+    var query="select email,password,role,status from user where email=?";
+    connection.query(query,[email],(err,results)=>{
         if(!err){
             if(results.length <=0){
-                query="insert into user(name,contactno,email,password,status,role) values(?,?,?,?,'false','user')";
-                connection.query(query,[user.name,user.contactno,user.email,user.password],(err,results)=>{
+                var query="insert into user(name,contactno,email,password,status,role) values(?,?,?,?,'false','user')";
+                connection.query(query,[name,contactno,email,password,status,role],(err,results)=>{
                     if(!err){
                         return res.status(200).json({message: "successfully Registered"});
                     }
