@@ -10,7 +10,7 @@ app.use('/user',userRoute);
 
 //const server =http.createServer(app);
 //server.listen(process.env.PORT);
-port=process.env.port || 3001
+port=process.env.port || 8080
 app.listen(port,function(){
     console.log('sucess');
 });

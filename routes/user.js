@@ -3,14 +3,20 @@ const express=require('express');
 const connection=require('../connection');
 const router=express.Router();
 
-router.post('./signup',(req,res)=>{
-    let user=req.body;
-    query="select email,password,role,status from user where email=?";
-    connection.query(query,[user.email],(err,results)=>{
+const jwt= require('jsonwebtoken');
+const nodemailer= require('nodemailer');
+require('dotenv').config();
+
+router.post('/signup',(req,res)=>{
+    const {name,contactno,email,password,status,role}=req.body;
+    //let user=req.body;
+    //let email=req.params.id;
+    var query="select email,password,role,status from user where email=?";
+    connection.query(query,[email],(err,results)=>{
         if(!err){
             if(results.length <=0){
-                query="insert into user(name,contactno,email,password,status,role) values(?,?,?,?,'false','user')";
-                connection.query(query,[user.name,user.contactno,user.email,user.password],(err,results)=>{
+                var query="insert into user(name,contactno,email,password,status,role) values(?,?,?,?,'false','user')";
+                connection.query(query,[name,contactno,email,password,status,role],(err,results)=>{
                     if(!err){
                         return res.status(200).json({message: "successfully Registered"});
                     }
@@ -42,7 +48,9 @@ router.post('./login',(req,res)=>{
                 return res.status.apply(401).json({message:"wait for Admin  Approval"});
             }
             else if(results[0].password == user.password){
-
+                  const response={email: results[0].email, role: results[0].role}
+                  const accessToken =jwt.sign(response,process.env.ACCESS_TOKEN,{expiresIn: '8h'})
+                  res.status(200).json({token: accessToken});
             }
             else{
                 return res.status(400).json({message:"something went wrong.please try again."});
